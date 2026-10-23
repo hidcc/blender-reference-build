@@ -1,6 +1,6 @@
 ---
 name: blender-reference-build
-description: Build a model in a live Blender session through MCP for Blender, working from reference images and/or a production prompt. The skill covers connecting (including fixing an add-on that won't connect), blockout, hard-surface detailing, step-by-step material reveal and studio lighting, and recordable viewport camera moves with a build-log overlay. Rigging, animation and the rendered video are an OPTIONAL phase, run only when the request asks for motion. Use this skill whenever someone wants Blender to recreate, model, build or "reproduce" something from reference images, a concept sheet or a prompt file — robots, vehicles, props, products, creatures, mechs — and also for "do this Blender MCP case study", "make a timelapse / making-of in Blender", "model this and render it", or "animate it walking and render the video", even if they don't say "skill" or "MCP".
+description: Build a model in a live Blender session through MCP for Blender, working from reference images and/or a production prompt. When there are no images, it first generates a reference sheet via Codex (codex-image-gen). The skill covers connecting (including fixing an add-on that won't connect), blockout, hard-surface detailing, step-by-step material reveal and studio lighting, and recordable viewport camera moves with a build-log overlay. Rigging, animation and the rendered video are an OPTIONAL phase, run only when the request asks for motion. Use this skill whenever someone wants Blender to recreate, model, build or "reproduce" something from reference images, a concept sheet, a prompt file or just a description — robots, vehicles, props, products, creatures, mechs — and also for "do this Blender MCP case study", "make a timelapse / making-of in Blender", "model this and render it", or "animate it walking and render the video", even if they don't say "skill" or "MCP".
 ---
 
 # Blender reference build (via MCP for Blender)
@@ -26,6 +26,23 @@ If the brief is ambiguous, for example a reference sheet with no word about moti
 **Recording mode.** Is the user screen-recording Blender (OBS, timelapse, "making-of")? If yes, use the viewport choreography and the build-log HUD from phase 2, and read `references/obs-recording.md`. That file covers the user's OBS setup, framing the viewport, starting and stopping the recording from Claude over OBS WebSocket (`scripts/obs_control.py`), and the replay workflow (`scripts/replay.py`): build once, then re-run the saved steps from an empty scene for a clean take. If the user isn't recording, skip all of this and just verify with `look`.
 
 Also note what the brief forbids. "No environment" means studio only. "Don't redesign" means stay close to the reference proportions. Re-read those constraints before each phase.
+
+## 0b. No references? Generate them first
+
+When the user describes a subject but gives no images, or the images are too vague to measure (one perspective shot), make references before modelling. Guessing the shape from text costs far more rework later.
+
+1. If the `codex-image-gen` skill is available, use it. Otherwise ask the user for images, or for permission to use another image tool.
+2. Generate a **reference sheet** with its turnaround template: front, side, top and back orthographic views on one sheet, a 3/4 hero view, 2–3 detail close-ups, plain background, flat light, primitive-based forms. Put the user's design words into the brief (colours, part counts, proportions, style).
+3. Review the sheet as a modeller would:
+   - Are the part counts and proportions the same in every view?
+   - Is the side view truly orthographic?
+   - Are there forms you can't build from sweeps and primitives?
+
+   Fix with one or two `--image` edit passes. Stay within the codex-image-gen budget.
+4. Save to `ref/sheet.png` (plus `ref/hero.png` if you made one), and write `ref/prompt.txt`: a short brief with the subject, key proportions read off the sheet, palette, build-order hints and constraints. From here on, treat these files like user-supplied references.
+5. Show the sheet to the user before modelling: "this is what I'll build". A quick yes here saves a whole rebuild.
+
+If something about the sheet causes trouble during modelling (an ambiguous part, an impossible view), add a line about it to codex-image-gen's `references/prompt-templates.md`, so that future sheets avoid it.
 
 ## 1. Connect to Blender
 

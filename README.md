@@ -7,6 +7,7 @@ A [Claude Code](https://claude.com/claude-code) skill that builds models in a **
 ## What it does
 
 - **Connects** to Blender. When the add-on won't connect, it diagnoses the problem, including the stale-module-name trap in saved preferences.
+- **Generates references when there are none.** With the companion [codex-image-gen](https://github.com/hidcc/codex-image-gen) skill it produces an orthographic turnaround sheet through the Codex CLI, reviews it for modelability, fixes it, and writes `ref/prompt.txt`.
 - **Scopes the job first.** It picks one of three tiers, so rigging and rendering only happen when the brief asks for motion:
   - **Model**: model + stills
   - **Animation**: adds rig + motion
