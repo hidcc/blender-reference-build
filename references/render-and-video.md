@@ -34,12 +34,9 @@ Blender 5.x video output: set `image_settings.media_type = 'VIDEO'` (wrapped in 
    ```
    `render_final.py` sets the GPU, samples, `use_overwrite=False` and `use_placeholder=True`. Re-running the same command resumes and skips the frames already done.
 3. Wait without polling, using a `run_in_background` loop: `while kill -0 $PID; do sleep 60; done`, then count the frames, grep the log for errors, and encode (`scripts/encode.sh renders/final renders/final.mp4 24`).
+   To stop a render: kill the Blender PID; a broad `pkill -f render_final.py` also kills the waiting loop, since the loop's own command line matches. Then delete the zero-byte placeholder of the frame that was in progress (`find renders/final -name 'frame_*.png' -size -10k -delete`), so a resume re-renders it.
 4. Check the result: `ffprobe` the duration, extract frames at the start, middle, exit point and end, tile them with ffmpeg `xstack`, and look at the sheet.
 
 ## Viewport recording (OBS)
 
-The rendered camera stays calm; the expressive camera work is the viewport. In recording mode:
-- `hud(step, title, sub, pct)` draws the build log, and the label is set with `hud_label("PROJECT-01")`
-- `shots([...])` queues eased orbit, push-in and pull-back moves with holds
-- after each material or lighting stage, queue a slow orbit so highlights move across the surfaces
-- hide the grid, axes and gizmos, keep a flat grey background, and use studio solid lighting with cavity during clay stages
+The rendered camera stays calm; the expressive camera work belongs to the viewport. For OBS setup, recording control and the replay workflow, see `obs-recording.md`.

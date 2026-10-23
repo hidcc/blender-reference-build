@@ -23,7 +23,7 @@ Read the brief (prompt file, message, images). Then fix two choices.
 
 If the brief is ambiguous, for example a reference sheet with no word about motion, ask once with AskUserQuestion. Offer: Model + stills (recommended), Animation (no final render), Full video. Don't build a rig nobody asked for.
 
-**Recording mode.** Is the user screen-recording Blender (OBS, timelapse, "making-of")? If yes, use the viewport choreography and the build-log HUD from phase 2. If not, skip them and just verify with `look`.
+**Recording mode.** Is the user screen-recording Blender (OBS, timelapse, "making-of")? If yes, use the viewport choreography and the build-log HUD from phase 2, and read `references/obs-recording.md`. That file covers the user's OBS setup, framing the viewport, starting and stopping the recording from Claude over OBS WebSocket (`scripts/obs_control.py`), and the replay workflow (`scripts/replay.py`): build once, then re-run the saved steps from an empty scene for a clean take. If the user isn't recording, skip all of this and just verify with `look`.
 
 Also note what the brief forbids. "No environment" means studio only. "Don't redesign" means stay close to the reference proportions. Re-read those constraints before each phase.
 
@@ -49,7 +49,7 @@ Also note what the brief forbids. "No environment" means studio only. "Don't red
 Follow the brief's build order if it gives one. Otherwise go from big to small: main mass, major secondary masses, the hero feature (head/sensor/cockpit), underside, the first instance of a repeated part, the remaining instances, joints/pivots, actuators/pistons, contact parts (feet/wheels), panelling, vents/hatches, cables, fine details.
 
 For each step:
-1. Run one `execute_blender_code` call that builds just that step. Name objects with a part prefix (`Body_`, `Leg_FR_`, `Head_`), so a step can be rebuilt with `clear(prefix)`.
+1. Build just that step with one script. Name objects with a part prefix (`Body_`, `Leg_FR_`, `Head_`), so a step can be rebuilt with `clear(prefix)`. In recording mode, write the step to `steps/NN_name.py` and run it with `mcp_send.py code`, because the file then doubles as the replay script for the clean take. Otherwise `execute_blender_code` is fine.
 2. In recording mode, update the HUD and queue 2–4 shots, mixing scales: macro (whole silhouette), medium (assembly), micro (joint/bolt). Shots are interpolated in angle, so moves read as orbits and push-ins rather than jumps.
 3. **Look before moving on.** Call `look` with `mode: "angles"` and two views (one matching the reference angle, one revealing) and compare against the reference image. Fix problems now: wrong orientation, parts hidden inside other parts, thin or wrong proportions. These are cheap to fix at this point and expensive later.
 
@@ -109,4 +109,4 @@ Send the key images or the video with SendUserFile.
 
 - Small steps and a look after each. One script per build step keeps failures local, and a broken step can be rebuilt by prefix.
 - Keep the user's session usable. Long renders go in a separate `blender -b` process, never in the UI session.
-- Save the step scripts into the project (e.g. `steps/NN_name.py`), so the whole build can be replayed for a recording.
+- Save the step scripts into the project (e.g. `steps/NN_name.py`), so the whole build can be replayed for a recording (`scripts/replay.py steps/ --obs`).

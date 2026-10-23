@@ -13,7 +13,10 @@ A [Claude Code](https://claude.com/claude-code) skill that builds models in a **
   - **Video**: adds the final rendered clip
 - **Builds step by step** in the order a viewer can follow: blockout → secondary masses → hero feature → repeated parts → joints/actuators → panelling, vents, cables, details. After every step it checks the result against the reference with `look`.
 - **Reveals the materials in stages** (clay → dark mechanics → main paint → inserts → metals → optics → emissives), then builds a **studio** with a seamless cyclorama, area lights and a calm 3/4 render camera.
-- **Recording mode** for OBS timelapses and making-of videos: eased viewport orbits and push-ins, plus a build-log HUD overlay.
+- **Recording mode** for OBS timelapses and making-of videos:
+  - eased viewport orbits and push-ins, plus a build-log HUD overlay
+  - OBS start/stop/scene/chapter control over OBS WebSocket v5 (no dependencies)
+  - `replay.py` re-runs the saved build steps from an empty scene for a clean, repeatable take
 - **Optional motion and video**: a scripted armature, rigid bone binding, IK legs, pistons on Damped Track, and procedural gaits with planted feet that are checked numerically. Then an EEVEE preview MP4, a resumable background Cycles PNG sequence, and ffmpeg encoding.
 
 ## Install
@@ -26,6 +29,7 @@ Requirements:
 - Blender 4.2+ (tested on 5.1)
 - the MCP for Blender add-on, enabled, with its MCP server registered in Claude Code (`claude mcp add blender uvx mcp-for-blender`)
 - `ffmpeg` for encoding
+- optional: OBS 28+ with the WebSocket server enabled, and `OBS_WS_PASSWORD` exported, for recorded takes
 
 Computer use is optional; it is only needed if you want Claude to open Blender and click through the add-on setup itself.
 
@@ -45,11 +49,14 @@ references/                   loaded on demand
   connection-troubleshooting.md
   hard-surface-techniques.md  sweeps, grooved seams, ports, surface placement, known bugs
   rig-and-walk.md             armature by script, IK, procedural gait, checks
-  render-and-video.md         stills, EEVEE preview, resumable Cycles, encoding, OBS mode
+  render-and-video.md         stills, EEVEE preview, resumable Cycles, encoding
+  obs-recording.md            OBS setup, viewport framing, WebSocket control, replay takes, timelapse edit
   case-study-spider.md        a full Video-tier run with numbers that worked
 scripts/
   hslib.py                    geometry/material/viewport-choreography/HUD helpers (import inside Blender)
   mcp_send.py                 run a script file through the add-on socket
+  replay.py                   replay steps/NN_*.py for a recorded take (optionally drives OBS)
+  obs_control.py              OBS WebSocket v5 client: status/start/stop/pause/resume/scene/chapter
   gpu_setup.py render_still.sh render_preview.py render_final.py encode.sh fix_addon_prefs.py
 ```
 
