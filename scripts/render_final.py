@@ -1,6 +1,7 @@
 """Final Cycles animation as a resumable PNG sequence (rerun the same command to resume).
 
-usage: nohup caffeinate -i blender -b file.blend --python render_final.py -a -- [out_dir] [samples] [percent] &
+usage: nohup [caffeinate -i] blender -b file.blend --python render_final.py -a -- [out_dir] [samples] [percent] &
+(caffeinate is macOS only; on Linux use `systemd-inhibit` or drop it.)
 """
 import os
 import sys

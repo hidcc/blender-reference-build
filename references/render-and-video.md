@@ -9,7 +9,8 @@ python3 mcp_send.py code save.py          # or execute_blender_code: bpy.ops.wm.
 ## Stills
 
 `scripts/render_still.sh <file.blend> <out_prefix> <percent> <samples> <frame> [frame...]`
-- Turns on GPU (Metal on Apple Silicon, otherwise whatever Cycles offers) via `gpu_setup.py`. Without it, background renders fall back to CPU, about 3× slower.
+- Uses `$BLENDER` if set, else the macOS app path, else `blender` on PATH.
+- Turns on GPU (Metal on Apple Silicon, otherwise whatever Cycles offers) via `gpu_setup.py`. Without it, background renders fall back to CPU, about 3× slower. On Linux, older AMD cards (e.g. Polaris RX 470–590) have no Cycles HIP support, so expect CPU; measure one frame before promising times.
 - First pass at 50 % and 64 samples; the hero still at 100 % and 128 samples.
 - Measured on an Apple M5: about 30 s per half-res frame, about 2 min per 1080p/128-sample frame.
 
@@ -32,7 +33,8 @@ Blender 5.x video output: set `image_settings.media_type = 'VIDEO'` (wrapped in 
 2. Start it detached and resumable:
    ```bash
    mkdir -p renders/final
-   nohup caffeinate -i Blender -b file.blend --python render_final.py -a > renders/final/render.log 2>&1 &
+   nohup caffeinate -i Blender -b file.blend --python render_final.py -a > renders/final/render.log 2>&1 &   # macOS
+   nohup blender -b file.blend --python render_final.py -a > renders/final/render.log 2>&1 &              # Linux
    ```
    `render_final.py` sets the GPU, samples, `use_overwrite=False` and `use_placeholder=True`. Re-running the same command resumes and skips the frames already done.
 3. Wait without polling, using a `run_in_background` loop: `while kill -0 $PID; do sleep 60; done`, then count the frames, grep the log for errors, and encode (`scripts/encode.sh renders/final renders/final.mp4 24`).

@@ -5,10 +5,11 @@ The MCP server (`uvx mcp-for-blender`, registered in Claude Code) talks to an ad
 ## Diagnose in this order
 
 ```bash
-lsof -nP -iTCP:9876 -sTCP:LISTEN          # is Blender listening?
-ps aux | grep -i "[B]lender.app"          # is Blender running at all, and only once?
+lsof -nP -iTCP:9876 -sTCP:LISTEN          # is Blender listening? (Linux: ss -ltnp | grep 9876)
+ps aux | grep -i "[B]lender.app"          # is Blender running at all, and only once? (Linux: pgrep -a blender)
 claude mcp get blender                    # is the MCP server side connected?
 ls ~/Library/Application\ Support/Blender/*/scripts/addons/   # where the add-on file lives (macOS)
+ls ~/.config/blender/*/scripts/addons/                        # same on Linux
 ```
 
 - Nothing is listening and the N-panel has **no "MCP for Blender" tab**: the add-on is not registered in this Blender. See below.
@@ -21,11 +22,11 @@ The saved user preferences can list an add-on module that no longer exists (for 
 
 1. Confirm that the add-on itself loads, in a throwaway headless Blender:
    ```bash
-   /Applications/Blender.app/Contents/MacOS/Blender -b -noaudio --python check.py
+   /Applications/Blender.app/Contents/MacOS/Blender -b -noaudio --python check.py   # Linux: blender -b -noaudio --python check.py
    ```
    where `check.py` runs `addon_utils.enable("blender_mcp", default_set=False)` and prints `[a.module for a in bpy.context.preferences.addons]`. The "Add-on not loaded: ... No module named ..." line shows the stale name.
 2. Fix the preferences headlessly with `scripts/fix_addon_prefs.py`. Back up `config/userpref.blend` first. The script disables the stale name, enables `blender_mcp` and saves the user prefs.
-3. Restart the user's Blender. Only do this when the open scene has nothing worth saving (an untitled default scene); otherwise ask. `osascript -e 'tell application "Blender" to quit'` gets cancelled by the unsaved-changes dialog, so with a disposable scene end the process instead. Then `open -a Blender` and wait until port 9876 is listening.
+3. Restart the user's Blender. Only do this when the open scene has nothing worth saving (an untitled default scene); otherwise ask. `osascript -e 'tell application "Blender" to quit'` gets cancelled by the unsaved-changes dialog, so with a disposable scene end the process instead. Then `open -a Blender` and wait until port 9876 is listening. On Linux: `pkill -x blender` for a disposable scene, then relaunch detached (`DISPLAY=:0 nohup blender >/tmp/blender.log 2>&1 &`). A tarball install has no desktop entry, so use the binary or a symlink on PATH.
 
 ## Driving Blender's UI with computer use
 
