@@ -17,6 +17,8 @@ What to look for against the reference:
 - Saturated paint looking pastel: the lights are too strong. Lower their energy by 2–3×, and darken the backdrop's albedo.
 - Emissive rings clipping to white: strength around 5, and a more saturated emission colour.
 - The hero feature hidden: move the camera, not the model.
+- **A second camera angle shows a dark void behind the subject.** The cyclorama faces one camera. For each extra angle, re-aim the cyc and its backdrop light at that camera in a render-time `--python` script, and leave the saved scene alone.
+- **Light power depends on distance.** Values that worked for a ~2 m subject lit from 5–6 m (key ~1000 W) are far too strong for a 0.6 m product lit from ~1.4 m. Scale by (distance ratio)²: the drone used key 55 / fill 14 / rims 40 & 32 / top 22 / backdrop 30 W.
 
 ## Preview video (fast)
 

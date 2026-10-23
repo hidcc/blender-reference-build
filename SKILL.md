@@ -7,7 +7,7 @@ description: Build a model in a live Blender session through MCP for Blender, wo
 
 Turn reference images and a brief into a finished Blender scene. Do the building in the user's live Blender with the `mcp__blender__*` tools. When the user will record the session, also make the viewport look good while you work.
 
-The approach comes from a full reproduction of a hard-surface robot (the "Mechanical Spider" case study). See `references/case-study-spider.md` for what it looked like in practice.
+The approach comes from a full reproduction of a hard-surface robot (the "Mechanical Spider" case study, `references/case-study-spider.md`). It was then checked end to end on a delivery drone built from a Codex-generated sheet (`references/case-study-drone.md`).
 
 ## 0. Decide the scope before touching Blender
 
@@ -59,7 +59,8 @@ If something about the sheet causes trouble during modelling (an ambiguous part,
   - overlay: the build-log HUD (`hud`)
 - Use the bundled `scripts/mcp_send.py` (`python3 mcp_send.py code file.py`) to run long scripts from a file. It talks to the same socket as the MCP server, so it is handy for anything you want saved in the project as a reproducible step file.
 - Clear the default scene. Set the viewport to clay: solid shading, single grey colour, cavity on, no grid floor or axes, sidebar hidden. Set fps and frame range now if motion is planned.
-- Lay the subject out on paper before modelling: centre, main radii, attachment points, limb angles. Put these numbers in one place (constants at the top of a step file) so every later step reuses them. Reworking proportions late is the most expensive mistake.
+- Lay the subject out on paper before modelling: centre, main radii, attachment points, limb angles. With an orthographic sheet, measure in pixels: pick one known length (e.g. the body length) as the scale, then read the other sizes as ratios from the same view. Check the top view and the front view separately, because generated sheets don't always keep one scale across views.
+- Model at real-world scale when the brief gives a size. Then remember to scale camera distances and light power to match (see `references/render-and-video.md`). Put these numbers in one place (constants at the top of a step file) so every later step reuses them. Reworking proportions late is the most expensive mistake.
 
 ## 3. Model in the order a viewer can follow
 
